@@ -1,0 +1,4 @@
+*.root
+*.sw*
+main
+*.o
