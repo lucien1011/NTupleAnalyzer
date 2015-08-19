@@ -14,6 +14,7 @@ void analysisClass_L1Trigger::loop(){
 
   tuple_tree -> fChain -> SetBranchStatus("*", kFALSE);
   tuple_tree -> fChain -> SetBranchStatus("run", kTRUE);
+  tuple_tree -> fChain -> SetBranchStatus("lumi", kTRUE);
   tuple_tree -> fChain -> SetBranchStatus("event", kTRUE);
   tuple_tree -> fChain -> SetBranchStatus("bx", kTRUE);
   tuple_tree -> fChain -> SetBranchStatus("hlt", kTRUE);
@@ -25,9 +26,10 @@ void analysisClass_L1Trigger::loop(){
     tuple_tree -> GetEntry(i);
     if ( (i + 1) % 1000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
 
-    int RunNumber = tuple_tree -> run ;
+    int runNumber = tuple_tree -> run ;
     int bunchNumber = tuple_tree -> bx ;
-    int eventNumber = tuple_tree -> event;
+    int lumiSection = tuple_tree -> lumi ;
+    int eventNumber = tuple_tree -> event ;
 
     tw1 = tuple_tree -> tw1;
     tw2 = tuple_tree -> tw2;
@@ -54,6 +56,9 @@ void analysisClass_L1Trigger::loop(){
 	  if (preTrigEvent.find(eventNumber) == preTrigEvent.end()){
 	     preTrigEvent[eventNumber] = std::vector<std::string>{};
 	   };
+	  if (eventLumiMap.find(eventNumber) == eventLumiMap.end()){
+	    eventLumiMap[eventNumber] = lumiSection;
+	  };
 	  preTrigEvent[eventNumber].push_back(trigbit_iter -> first);
         }
       }
@@ -66,7 +71,7 @@ void analysisClass_L1Trigger::loop(){
   f = fopen("preTrigEventList.txt","w");
   std::map<int,std::vector<std::string>>::iterator itr;
   for (itr = preTrigEvent.begin(); itr != preTrigEvent.end(); itr++){
-    fprintf(f,"%d \n",itr -> first);
+    fprintf(f,"%d %d \n", eventLumiMap[itr -> first], itr -> first);
   };
   fclose(f);
 

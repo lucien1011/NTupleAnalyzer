@@ -20,7 +20,7 @@ private :
   std::map<std::string,int> L1TriggerBitMap;
   std::map<std::string,int>::iterator trigbit_iter;
   std::map<int,std::vector<std::string>> preTrigEvent;
-  
+  std::map<int,int> eventLumiMap;
   std::vector<ULong64_t> tw1;
   std::vector<ULong64_t> tw2;
 
