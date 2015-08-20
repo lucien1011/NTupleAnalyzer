@@ -1,14 +1,14 @@
 #include "CustomTree.h"
 #include "analysisClass_L1Trigger.h"
+#include <algorithm>
 
 void analysisClass_L1Trigger::loop(){
 
   std::string MyTrigger="HLT_Any";
-  std::vector<Int_t> pretrig_Bx = {374,1268,2150,3044};
 
   CustomTree * tuple_tree = getTree<CustomTree>("tuple_tree");
   int n_events = tuple_tree -> fChain -> GetEntries();
-  std::cout << "n events = " << n_events << std::endl;
+  //std::cout << "n events = " << n_events << std::endl;
 
   loadTrigMap();
 
@@ -33,7 +33,7 @@ void analysisClass_L1Trigger::loop(){
 
     tw1 = tuple_tree -> tw1;
     tw2 = tuple_tree -> tw2;
- 
+
     // check if the event is fired with the selected HLT
     bool accept=false;
     if (MyTrigger=="HLT_Any") {
@@ -47,12 +47,13 @@ void analysisClass_L1Trigger::loop(){
 
 
     Int_t nBx=tw1.size();
+    // std::cout << "Number of Bunch Number: " << nBx << std::endl;
     for (trigbit_iter = L1TriggerBitMap.begin(); trigbit_iter != L1TriggerBitMap.end(); trigbit_iter++){
-      int ibit=trigbit_iter->second;
-      //for(Int_t ibx=0; ibx < nBx; ibx++){
-      for (std::vector<Int_t>::iterator it = pretrig_Bx.begin(); it != pretrig_Bx.end(); ++it){
-        bool Fired = checkTriggerBit(*it,bunchNumber);
-        if (Fired) {
+      int ibit = trigbit_iter->second;
+      for(Int_t ibx=0; ibx < nBx; ibx++){
+      // for (std::vector<Int_t>::iterator it = pretrig_Bx.begin(); it != pretrig_Bx.end(); ++it){
+        bool Fired = checkTriggerBit(ibit,ibx);
+        if (Fired and isSelectedBx(bunchNumber)) {
 	  if (preTrigEvent.find(eventNumber) == preTrigEvent.end()){
 	     preTrigEvent[eventNumber] = std::vector<std::string>{};
 	   };
@@ -77,6 +78,12 @@ void analysisClass_L1Trigger::loop(){
 
 
 }
+
+bool analysisClass_L1Trigger::isSelectedBx(int bunchNumber){
+  std::vector<int> pretrig_Bx = {374,1268,2150,3044};
+  return (std::find(pretrig_Bx.begin(),pretrig_Bx.end(),bunchNumber) != pretrig_Bx.end());
+}
+
 
 bool analysisClass_L1Trigger::checkTriggerBit(const int & ibit,const int & ibx ){
   bool Fired(false);
