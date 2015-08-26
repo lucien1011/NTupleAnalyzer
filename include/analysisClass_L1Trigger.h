@@ -13,7 +13,7 @@ class analysisClass_L1Trigger : public analysisClass {
   void loop();
   bool checkTriggerBit(const int & ibit,const int & ibx);
   void loadTrigMap();
-  bool isSelectedBx(int bunchNumber); 
+  bool isSelectedBx(int bunchNumber);
 
 private :
 

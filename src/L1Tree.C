@@ -1,14 +1,14 @@
-#define CustomTree_cxx
-#include "CustomTree.h"
+#define L1Tree_cxx
+#include "L1Tree.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void CustomTree::Loop()
+void L1Tree::Loop()
 {
 //   In a ROOT session, you can do:
-//      root> .L CustomTree.C
-//      root> CustomTree t
+//      root> .L L1Tree.C
+//      root> L1Tree t
 //      root> t.GetEntry(12); // Fill t data members with entry number 12
 //      root> t.Show();       // Show values of entry 12
 //      root> t.Show(16);     // Read and show values of entry 16

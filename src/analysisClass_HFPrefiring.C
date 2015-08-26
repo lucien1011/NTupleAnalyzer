@@ -1,14 +1,13 @@
 #include "L1Tree.h"
-#include "analysisClass_L1Trigger.h"
+#include "analysisClass_HFPrefiring.h"
 #include <algorithm>
 
-void analysisClass_L1Trigger::loop(){
+void analysisClass_HFPrefiring::loop(){
 
   std::string MyTrigger="HLT_Any";
 
-  L1Tree * tuple_tree = getTree<L1Tree>("tuple_tree");
+  CustomTree * tuple_tree = getTree<L1Tree>("tuple_tree");
   int n_events = tuple_tree -> fChain -> GetEntries();
-  //std::cout << "n events = " << n_events << std::endl;
 
   loadTrigMap();
 
@@ -20,6 +19,8 @@ void analysisClass_L1Trigger::loop(){
   tuple_tree -> fChain -> SetBranchStatus("hlt", kTRUE);
   tuple_tree -> fChain -> SetBranchStatus("tw1", kTRUE);
   tuple_tree -> fChain -> SetBranchStatus("tw2", kTRUE);
+
+  bookHistograms();
 
 
   for (int i = 0; i < n_events; ++i){
@@ -48,7 +49,8 @@ void analysisClass_L1Trigger::loop(){
 
     Int_t nBx=tw1.size();
     // std::cout << "Number of Bunch Number: " << nBx << std::endl;
-    for (trigbit_iter = L1TriggerBitMap.begin(); trigbit_iter != L1TriggerBitMap.end(); trigbit_iter++){
+    for (trigbit_iter = HFPrefiringBitMap.begin(); trigbit_iter != HFPrefiringBitMap.end(); trigbit_iter++){
+      std::string = trigbit_iter -> first;
       int ibit = trigbit_iter->second;
       for(Int_t ibx=0; ibx < nBx; ibx++){
       // for (std::vector<Int_t>::iterator it = pretrig_Bx.begin(); it != pretrig_Bx.end(); ++it){
@@ -79,13 +81,13 @@ void analysisClass_L1Trigger::loop(){
 
 }
 
-bool analysisClass_L1Trigger::isSelectedBx(int bunchNumber){
+bool analysisClass_HFPrefiring::isSelectedBx(int bunchNumber){
   std::vector<int> pretrig_Bx = {374,1268,2150,3044};
   return (std::find(pretrig_Bx.begin(),pretrig_Bx.end(),bunchNumber) != pretrig_Bx.end());
 }
 
 
-bool analysisClass_L1Trigger::checkTriggerBit(const int & ibit,const int & ibx ){
+bool analysisClass_HFPrefiring::checkTriggerBit(const int & ibit,const int & ibx ){
   bool Fired(false);
   if (ibit<64){
     Fired = (tw1[ibx]>>ibit)&1;
@@ -95,16 +97,14 @@ bool analysisClass_L1Trigger::checkTriggerBit(const int & ibit,const int & ibx )
   return Fired;
 };
 
-void analysisClass_L1Trigger::loadTrigMap(){ // these bits can change! check these are correct for the run you are using
+void analysisClass_HFPrefiring::loadTrigMap(){ // these bits can change! check these are correct for the run you are using
 
-  L1TriggerBitMap["L1_SingleJet128"] = 20;
-  L1TriggerBitMap["L1_SingleJet176"] = 21;
-  L1TriggerBitMap["L1_SingleJet200"] = 22;
+  HFPrefiringBitMap["L1_SingleJet128"] = 20;
+  HFPrefiringBitMap["L1_SingleJet176"] = 21;
+  HFPrefiringBitMap["L1_SingleJet200"] = 22;
 
-  L1TriggerBitMap["L1_HTT75"] = 8;
-  L1TriggerBitMap["L1HTT100"] = 15;
+  HFPrefiringBitMap["L1_HTT75"] = 8;
+  HFPrefiringBitMap["L1HTT100"] = 15;
 
 }
-
-
 
