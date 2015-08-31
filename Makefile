@@ -5,8 +5,8 @@ ROOTLIBS=  `root-config --glibs --cflags | sed 's/-pthread//g'` -lMinuit
 INC= -I./include 
 LIBS= ${ROOTLIBS} 
 SRC= ./src
-BASE_OBJECTS=$(SRC)/analysisClass_L1Trigger.o $(SRC)/analysisClass.o $(SRC)/baseClass.o
-TREE_OBJECTS=$(SRC)/L1Tree.o 
+BASE_OBJECTS=$(SRC)/analysisClass_HFPrefiring.o $(SRC)/analysisClass.o $(SRC)/baseClass.o
+TREE_OBJECTS=$(SRC)/L1Tree.o $(SRC)/L1ExtraTree.o 
 OBJECTS=$(BASE_OBJECTS) $(TREE_OBJECTS)
 
 default: main

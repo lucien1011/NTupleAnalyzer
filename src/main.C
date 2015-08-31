@@ -1,5 +1,5 @@
 #include <iostream>
-#include "analysisClass_L1Trigger.h"
+#include "analysisClass_HFPrefiring.h"
 
 int main(int argc, char* argv[]){
 
@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
   std::string treeList (argv[2]);
   std::string outFile  (argv[3]);
   
-  analysisClass_L1Trigger analysis (inputList, treeList, outFile);
+  analysisClass_HFPrefiring analysis (inputList, treeList, outFile);
   
   analysis.run();
 }

@@ -1,4 +1,5 @@
 #include "L1Tree.h"
+#include "L1ExtraTree.h"
 #include "analysisClass_HFPrefiring.h"
 #include <algorithm>
 
@@ -6,84 +7,110 @@ void analysisClass_HFPrefiring::loop(){
 
   std::string MyTrigger="HLT_Any";
 
-  CustomTree * tuple_tree = getTree<L1Tree>("tuple_tree");
-  int n_events = tuple_tree -> fChain -> GetEntries();
+  L1Tree * l1Tree = getTree<L1Tree>("l1Tree");
+  L1ExtraTree * l1ExtraTree = getTree<L1ExtraTree>("l1ExtraTree");
+
+  int n_events = l1Tree -> fChain -> GetEntries();
 
   loadTrigMap();
 
-  tuple_tree -> fChain -> SetBranchStatus("*", kFALSE);
-  tuple_tree -> fChain -> SetBranchStatus("run", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("lumi", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("event", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("bx", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("hlt", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("tw1", kTRUE);
-  tuple_tree -> fChain -> SetBranchStatus("tw2", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("*", kFALSE);
+  l1Tree -> fChain -> SetBranchStatus("run", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("lumi", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("event", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("bx", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("hlt", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("tw1", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("tw2", kTRUE);
 
-  bookHistograms();
+  l1ExtraTree -> fChain -> SetBranchStatus("*", kFALSE);
+  l1ExtraTree -> fChain -> SetBranchStatus("nFwdJets", kTRUE);
+  l1ExtraTree -> fChain -> SetBranchStatus("fwdJetEt", kTRUE);
+  l1ExtraTree -> fChain -> SetBranchStatus("fwdJetBx", kTRUE);
 
+  l1ExtraTree -> fChain -> SetBranchStatus("cenJetEt", kTRUE);
+  l1ExtraTree -> fChain -> SetBranchStatus("nCenJets", kTRUE);
+  l1ExtraTree -> fChain -> SetBranchStatus("cenJetBx", kTRUE);
+
+  TH1F * h_preFireRate = makeTH1F("h_preFireRate",10,-4.5,5.5);
+  TH1F * h_fwdJetPtBxM1 = makeTH1F("h_fwdJetPtBxM1",101,-0.5,105.5);
 
   for (int i = 0; i < n_events; ++i){
-    tuple_tree -> GetEntry(i);
+    l1Tree -> GetEntry(i);
+    l1ExtraTree -> GetEntry(i);
     if ( (i + 1) % 1000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
 
-    int runNumber = tuple_tree -> run ;
-    int bunchNumber = tuple_tree -> bx ;
-    int lumiSection = tuple_tree -> lumi ;
-    int eventNumber = tuple_tree -> event ;
+    int runNumber = l1Tree -> run ;
+    int bunchNumber = l1Tree -> bx ;
+    int lumiSection = l1Tree -> lumi ;
+    int eventNumber = l1Tree -> event ;
 
-    tw1 = tuple_tree -> tw1;
-    tw2 = tuple_tree -> tw2;
+    int nCenJet = l1ExtraTree -> nCenJets;
+    int nFwdJet = l1ExtraTree -> nFwdJets;
+    std::vector<double> fwdJetEt = l1ExtraTree -> fwdJetEt;
+    std::vector<double> cenJetEt = l1ExtraTree -> cenJetEt;
+    std::vector<int> fwdJetBx = l1ExtraTree -> fwdJetBx;
+    std::vector<int> cenJetBx = l1ExtraTree -> cenJetBx;
+
+    tw1 = l1Tree -> tw1;
+    tw2 = l1Tree -> tw2;
 
     // check if the event is fired with the selected HLT
     bool accept=false;
     if (MyTrigger=="HLT_Any") {
       accept=true;
     }else{
-      int ntrigs = tuple_tree -> hlt.size();
+      int ntrigs = l1Tree -> hlt.size();
       for (int itrig=0; itrig<ntrigs; itrig++){
-        if (tuple_tree -> hlt[itrig] == MyTrigger) accept=true;
+        if (l1Tree -> hlt[itrig] == MyTrigger) accept=true;
       }
     };
 
+    double fwdJetPtBxM1 = getJetPt(fwdJetEt,fwdJetBx,-1);
+    double cenJetPtBxZero = getJetPt(cenJetEt,cenJetBx,0);
+
+    if (cenJetPtBxZero > 50.){
+      h_fwdJetPtBxM1->Fill(fwdJetPtBxM1); 
+    };
 
     Int_t nBx=tw1.size();
-    // std::cout << "Number of Bunch Number: " << nBx << std::endl;
     for (trigbit_iter = HFPrefiringBitMap.begin(); trigbit_iter != HFPrefiringBitMap.end(); trigbit_iter++){
-      std::string = trigbit_iter -> first;
       int ibit = trigbit_iter->second;
-      for(Int_t ibx=0; ibx < nBx; ibx++){
-      // for (std::vector<Int_t>::iterator it = pretrig_Bx.begin(); it != pretrig_Bx.end(); ++it){
-        bool Fired = checkTriggerBit(ibit,ibx);
-        if (Fired and isSelectedBx(bunchNumber-1)) {
-	  if (preTrigEvent.find(eventNumber) == preTrigEvent.end()){
-	     preTrigEvent[eventNumber] = std::vector<std::string>{};
-	   };
-	  if (eventLumiMap.find(eventNumber) == eventLumiMap.end()){
-	    eventLumiMap[eventNumber] = lumiSection;
-	  };
-	  preTrigEvent[eventNumber].push_back(trigbit_iter -> first);
-        }
-      }
+      // for(Int_t ibx=0; ibx < nBx; ibx++){
+
+      bool Bx1Fired = checkTriggerBit(ibit,1);      
+      bool Bx2Fired = checkTriggerBit(ibit,2);      
+
+      if (Bx2Fired){
+        h_preFireRate -> Fill(2);
+	if (Bx1Fired){
+	  h_preFireRate -> Fill(1);
+
+	};
+      };
+
+      // }
     }// end of loop over trigger bits
   };
 
-  std::cout << "Number of event with pre-triggering: " << preTrigEvent.size() << std::endl;
+}
 
-  FILE * f;
-  f = fopen("preTrigEventList.txt","w");
-  std::map<int,std::vector<std::string>>::iterator itr;
-  for (itr = preTrigEvent.begin(); itr != preTrigEvent.end(); itr++){
-    fprintf(f,"%d %d \n", eventLumiMap[itr -> first], itr -> first);
+double analysisClass_HFPrefiring::getJetPt(const std::vector<double> & jetCollPt, const std::vector<int> & jetCollBx ,const int & bx){
+  double jetPt = 0.;
+  int nJet = jetCollPt.size();
+  for (int i = 0; i != nJet; i++){
+    if ((jetCollBx[i] == bx) && (jetCollPt[i] > jetPt)){
+      jetPt = jetCollPt[i];
+    };
   };
-  fclose(f);
-
+  return jetPt;
 
 }
 
 bool analysisClass_HFPrefiring::isSelectedBx(int bunchNumber){
-  std::vector<int> pretrig_Bx = {374,1268,2150,3044};
-  return (std::find(pretrig_Bx.begin(),pretrig_Bx.end(),bunchNumber) != pretrig_Bx.end());
+  // std::vector<int> pretrig_Bx = {374,1268,2150,3044};
+  std::vector<int> nominalBx = {375,1269,2151,3045};
+  return (std::find(nominalBx.begin(),nominalBx.end(),bunchNumber) != nominalBx.end());
 }
 
 
@@ -100,11 +127,11 @@ bool analysisClass_HFPrefiring::checkTriggerBit(const int & ibit,const int & ibx
 void analysisClass_HFPrefiring::loadTrigMap(){ // these bits can change! check these are correct for the run you are using
 
   HFPrefiringBitMap["L1_SingleJet128"] = 20;
-  HFPrefiringBitMap["L1_SingleJet176"] = 21;
-  HFPrefiringBitMap["L1_SingleJet200"] = 22;
+  // HFPrefiringBitMap["L1_SingleJet176"] = 21;
+  // HFPrefiringBitMap["L1_SingleJet200"] = 22;
 
-  HFPrefiringBitMap["L1_HTT75"] = 8;
-  HFPrefiringBitMap["L1HTT100"] = 15;
+  // HFPrefiringBitMap["L1_HTT75"] = 8;
+  // HFPrefiringBitMap["L1HTT100"] = 15;
 
 }
 

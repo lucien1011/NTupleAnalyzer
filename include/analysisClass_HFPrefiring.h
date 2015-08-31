@@ -14,6 +14,7 @@ class analysisClass_HFPrefiring : public analysisClass {
   bool checkTriggerBit(const int & ibit,const int & ibx);
   void loadTrigMap();
   bool isSelectedBx(int bunchNumber);
+  double getJetPt(const std::vector<double> & jetCollPt, const std::vector<int> & jetCollBx ,const int & bx);
 
 private :
 
