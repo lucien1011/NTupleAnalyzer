@@ -31,6 +31,8 @@ void analysisClassL1::loop(){
       histoMap[triggerName] = makeTH1F(hist_name,5,-0.5,4.5);
 
   };
+  int nBx1 = 0;
+  int nBx2 = 0;
 
   for (int i = 0; i < n_events; ++i){
     l1Tree -> GetEntry(i);
@@ -58,11 +60,14 @@ void analysisClassL1::loop(){
 
       if (Bx2Fired){
         histoMap[triggerName] -> Fill(2);
+	nBx2++
 	if (Bx1Fired){
 	  histoMap[triggerName] -> Fill(1);
+	  nBx1++;
 	};
       };
     }
   };
+  std::cout << "Prefire Rate: " << nBx1/nBx2 << std::endl;
 
 }
