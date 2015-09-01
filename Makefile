@@ -6,7 +6,7 @@ INC= -I./include
 LIBS= ${ROOTLIBS} 
 SRC= ./src
 BASE_OBJECTS=$(SRC)/analysisClassL1.o $(SRC)/analysisClass.o $(SRC)/baseClass.o
-TREE_OBJECTS=$(SRC)/L1Tree.o 
+TREE_OBJECTS=$(SRC)/L1Tree.o $(SRC)/L1ExtraTree.C 
 OBJECTS=$(BASE_OBJECTS) $(TREE_OBJECTS)
 
 default: main
