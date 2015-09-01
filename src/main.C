@@ -1,5 +1,5 @@
 #include <iostream>
-#include "analysisClass_PrefireRate.h"
+#include "analysisClassL1.h"
 
 int main(int argc, char* argv[]){
 
@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
   std::string treeList (argv[2]);
   std::string outFile  (argv[3]);
   
-  analysisClass_PrefireRate analysis (inputList, treeList, outFile);
+  analysisClassL1 analysis (inputList, treeList, outFile);
   
   analysis.run();
 }
