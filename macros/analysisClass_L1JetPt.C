@@ -52,7 +52,7 @@ void analysisClassL1::loop(){
   TH1F * h_leadingFwdJetPt = makeTH1F("h_leadingFwdJetPt",250,-0.5,249.5);
   TH1F * h_leadingFwdJetPt_BxM1 = makeTH1F("h_leadingFwdJetPt_BxM1",250,-0.5,249.5);
   TH2F * h_leadingFwdJet_Bx0_BxM1 = makeTH2F("h_leadingFwdJet_BxM1_Bx0",100,-0.5,249.5,100,-0.5,249.5);
-  TH2F * h_leadingFwdJet_Bx0_BxM1_CenJetPt50 = makeTH2F("h_leadingFwdJet_BxM1_Bx0",100,-0.5,249.5,100,-0.5,249.5);
+  TH2F * h_leadingFwdJet_Bx0_BxM1_CenJetPt50 = makeTH2F("h_leadingFwdJet_Bx0_BxM1_CenJetPt50",100,-0.5,249.5,100,-0.5,249.5);
 
   TH1F * h_fwdJetBx = makeTH1F("h_fwdJetBx",10,-5.5,4.5);
 
@@ -90,6 +90,7 @@ void analysisClassL1::loop(){
 
     // if (l1ExtraTree -> cenJetEt.size() != l1ExtraTree -> cenJetBx.size()) continue;
     // if (l1ExtraTree -> fwdJetEt.size() != l1ExtraTree -> fwdJetBx.size()) continue;
+    if ((l1ExtraTree -> cenJetEt.size() == 0) && (l1ExtraTree -> fwdJetEt.size() == 0) ) continue;
 
     leadingCenJetPt = 0.;
     for (int j = 0; j != l1ExtraTree -> cenJetEt.size(); j++){
@@ -121,7 +122,7 @@ void analysisClassL1::loop(){
     };
   };
 
-    h_leadingFwdJet_Bx0_BxM1 -> SetTitle(" ; leading E_{T} (Bx = 0) GeV ; leading E_{T} (Bx = -1) GeV ");
-    h_leadingFwdJet_Bx0_BxM1_CenJetPt50 -> SetTitle("Leading CenJet pT > 50 GeV ; leading E_{T} (Bx = 0) GeV ; leading E_{T} (Bx = -1) GeV ");
+    h_leadingFwdJet_Bx0_BxM1 -> SetTitle(" ; leading Fwd Jet E_{T} (Bx = 0) GeV ; leading Fwd Jet E_{T} (Bx = -1) GeV ");
+    h_leadingFwdJet_Bx0_BxM1_CenJetPt50 -> SetTitle("Leading Cen Jet pT > 50 GeV ; leading Fwd Jet E_{T} (Bx = 0) GeV ; leading Fwd Jet E_{T} (Bx = -1) GeV ");
 
 }
