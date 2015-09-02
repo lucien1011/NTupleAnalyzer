@@ -60,7 +60,7 @@ void analysisClassL1::loop(){
 
       if (Bx2Fired){
         histoMap[triggerName] -> Fill(2);
-	nBx2++
+	nBx2++;
 	if (Bx1Fired){
 	  histoMap[triggerName] -> Fill(1);
 	  nBx1++;
