@@ -32,16 +32,16 @@ private :
   };
   
   void loadTrigMap(){ 
-    // HFPrefiringBitMap["L1_SingleJet36"] = 23;
-    // HFPrefiringBitMap["L1_SingleJet52"] = 17;
-    // HFPrefiringBitMap["L1_SingleJet68"] = 18;
-    // HFPrefiringBitMap["L1_SingleJet92"] = 19;
+    HFPrefiringBitMap["L1_SingleJet036"] = 23;
+    HFPrefiringBitMap["L1_SingleJet052"] = 17;
+    HFPrefiringBitMap["L1_SingleJet068"] = 18;
+    HFPrefiringBitMap["L1_SingleJet092"] = 19;
     HFPrefiringBitMap["L1_SingleJet128"] = 20;
     HFPrefiringBitMap["L1_SingleJet176"] = 21;
     HFPrefiringBitMap["L1_SingleJet200"] = 22;
   
-    HFPrefiringBitMap["L1_HTT75"] = 8;
-    HFPrefiringBitMap["L1HTT100"] = 15;
+    // HFPrefiringBitMap["L1_HTT75"] = 8;
+    // HFPrefiringBitMap["L1HTT100"] = 15;
   
   };
 
