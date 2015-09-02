@@ -13,6 +13,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH1.h"
+#include "TGraph.h"
 
 
 class baseClass {
@@ -24,6 +25,8 @@ class baseClass {
 
   TH1F* makeTH1F(const char * name, int nbins , float xmin, float xmax);
   TH2F* makeTH2F(const char * name, int nbinsx, float xmin, float xmax, int nbinsy, float ymin, float ymax);
+  TGraph* makeTGraph(int n, const double* x, const double* y);
+  TGraph* makeTGraph();
 
   template<typename T> T* getTree(std::string tree_name, std::string file_label = std::string("no_label")){
     if ( m_treeMap.find ( tree_name ) == m_treeMap.end() ){
@@ -64,7 +67,7 @@ class baseClass {
   const std::string m_treeList;
   const std::string m_outFileName;
   
-  std::vector<TH1*> m_objects;
+  std::vector<TObject*> m_objects;
   
   TFile * m_outFile;
   
