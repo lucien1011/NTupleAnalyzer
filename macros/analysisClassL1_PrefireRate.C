@@ -75,7 +75,8 @@ void analysisClassL1::loop(){
       graphs[preFireTrigger[iTrig]] -> GetXaxis() -> SetBinLabel(nIt,triggerName.c_str());
     };
     char titleName[200];
-    sprintf(titleName," Pre Trigger: %s ; Trigger at Nominal BX  ; Pretrigger Rate",preFireTrigger[iTrig].c_str());
+    // sprintf(titleName," Pre Trigger: %s ; Trigger at Nominal BX  ; Pretrigger Rate",preFireTrigger[iTrig].c_str());
+    sprintf(titleName," ; Trigger at Nominal BX  ; Pretrigger Rate");
     graphs[preFireTrigger[iTrig]] -> SetTitle(titleName);
   };
 
