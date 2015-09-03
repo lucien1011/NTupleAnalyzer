@@ -3,6 +3,11 @@
 #include "analysisClassL1.h"
 #include <algorithm>
 
+double binoError(double selected, double all){
+  return sqrt(selected*(1-selected/all))/all ; 
+};
+
+
 void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
@@ -15,10 +20,6 @@ void analysisClassL1::loop(){
   loadTrigMap();
 
   l1Tree -> fChain -> SetBranchStatus("*", kFALSE);
-  // l1Tree -> fChain -> SetBranchStatus("run", kTRUE);
-  // l1Tree -> fChain -> SetBranchStatus("lumi", kTRUE);
-  // l1Tree -> fChain -> SetBranchStatus("event", kTRUE);
-  // l1Tree -> fChain -> SetBranchStatus("bx", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw1", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw2", kTRUE);
 
@@ -27,11 +28,6 @@ void analysisClassL1::loop(){
   for (int i = 0; i < n_events; ++i){
     l1Tree -> GetEntry(i);
     if ( (i + 1) % 10000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
-
-    // int runNumber = l1Tree -> run ;
-    // int bunchNumber = l1Tree -> bx ;
-    // int lumiSection = l1Tree -> lumi ;
-    // int eventNumber = l1Tree -> event ;
 
     tw1 = l1Tree -> tw1;
     tw2 = l1Tree -> tw2;
@@ -61,7 +57,7 @@ void analysisClassL1::loop(){
   	    if (nBx2[preFireTrigger[iTrig]].find(triggerName) == nBx2[preFireTrigger[iTrig]].end()){
   	      nBx1[preFireTrigger[iTrig]][triggerName] = 0;
   	    };
-              nBx1[preFireTrigger[iTrig]][triggerName]++;
+            nBx1[preFireTrigger[iTrig]][triggerName]++;
   	  };
         };
       };
@@ -75,10 +71,11 @@ void analysisClassL1::loop(){
       std::string triggerName = it -> first;
       int nIt = std::distance(nBx2[preFireTrigger[iTrig]].begin(),it)+1;
       graphs[preFireTrigger[iTrig]] -> SetBinContent(nIt,(double) nBx1[preFireTrigger[iTrig]][triggerName]/ it -> second);
+      graphs[preFireTrigger[iTrig]] -> SetBinError(nIt,binoError( nBx1[preFireTrigger[iTrig]][triggerName], it -> second) );
       graphs[preFireTrigger[iTrig]] -> GetXaxis() -> SetBinLabel(nIt,triggerName.c_str());
     };
     char titleName[200];
-    sprintf(titleName," Pre Trigger: %s ; ; Pretrigger Rate",preFireTrigger[iTrig].c_str());
+    sprintf(titleName," Pre Trigger: %s ; Trigger at Nominal BX  ; Pretrigger Rate",preFireTrigger[iTrig].c_str());
     graphs[preFireTrigger[iTrig]] -> SetTitle(titleName);
   };
 
