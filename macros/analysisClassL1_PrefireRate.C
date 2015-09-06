@@ -12,12 +12,14 @@ void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
   std::vector<std::string> preFireTrigger = {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200"};
+  // std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
 
   L1Tree * l1Tree = getTree<L1Tree>("l1Tree");
 
   int n_events = l1Tree -> fChain -> GetEntries();
 
-  loadTrigMap();
+  loadHTTTrigMap();
+  loadBitMap();
 
   l1Tree -> fChain -> SetBranchStatus("*", kFALSE);
   l1Tree -> fChain -> SetBranchStatus("tw1", kTRUE);
@@ -45,7 +47,7 @@ void analysisClassL1::loop(){
         int ibit = trigbit_iter->second;
         std::string triggerName = trigbit_iter->first;
         
-        bool Bx1Fired = checkTriggerBit(HFPrefiringBitMap[preFireTrigger[iTrig]],1);      
+        bool Bx1Fired = checkTriggerBit(BitMap[preFireTrigger[iTrig]],1);      
         bool Bx2Fired = checkTriggerBit(ibit,2);      
   
         if (Bx2Fired){

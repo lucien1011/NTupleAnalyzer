@@ -20,6 +20,7 @@ private :
   std::vector<ULong64_t> tw1;
   std::vector<ULong64_t> tw2;
   std::vector<TString> hlt;
+  std::map<std::string,int> BitMap;
 
   bool checkTriggerBit(const int & ibit,const int & ibx ){
     bool Fired(false);
@@ -31,7 +32,7 @@ private :
     return Fired;
   };
   
-  void loadTrigMap(){ 
+  void loadSingleJetTrigMap(){ 
     HFPrefiringBitMap["L1_SingleJet036"] = 23;
     HFPrefiringBitMap["L1_SingleJet052"] = 17;
     HFPrefiringBitMap["L1_SingleJet068"] = 18;
@@ -39,10 +40,33 @@ private :
     HFPrefiringBitMap["L1_SingleJet128"] = 20;
     HFPrefiringBitMap["L1_SingleJet176"] = 21;
     HFPrefiringBitMap["L1_SingleJet200"] = 22;
-  
-    // HFPrefiringBitMap["L1_HTT75"] = 8;
-    // HFPrefiringBitMap["L1HTT100"] = 15;
-  
+    HFPrefiringBitMap["L1_SingleJet240"] = 39;
+  };
+
+  void loadBitMap(){
+    BitMap["L1_SingleJet036"] = 23;
+    BitMap["L1_SingleJet052"] = 17;
+    BitMap["L1_SingleJet068"] = 18;
+    BitMap["L1_SingleJet092"] = 19;
+    BitMap["L1_SingleJet128"] = 20;
+    BitMap["L1_SingleJet176"] = 21;
+    BitMap["L1_SingleJet200"] = 22;
+    BitMap["L1_SingleJet240"] = 39;
+    BitMap["L1_HTT075"] = 8;
+    BitMap["L1_HTT100"] = 15;
+    BitMap["L1_HTT125"] = 70;
+    BitMap["L1_HTT150"] = 71;
+    BitMap["L1_HTT175"] = 72;
+    BitMap["L1_HTT200"] = 73; 
+  };
+
+  void loadHTTTrigMap(){
+    HFPrefiringBitMap["L1_HTT075"] = 8;
+    HFPrefiringBitMap["L1_HTT100"] = 15;
+    HFPrefiringBitMap["L1_HTT125"] = 70;
+    HFPrefiringBitMap["L1_HTT150"] = 71;
+    HFPrefiringBitMap["L1_HTT175"] = 72;
+    HFPrefiringBitMap["L1_HTT200"] = 73; 
   };
 
   bool checkHLT(const std::string MyTrigger){
