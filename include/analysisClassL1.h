@@ -21,6 +21,7 @@ private :
   std::vector<ULong64_t> tw2;
   std::vector<TString> hlt;
   std::map<std::string,int> BitMap;
+  std::map<int,std::map<std::string,int> > PrescaleMap;
 
   bool checkTriggerBit(const int & ibit,const int & ibx ){
     bool Fired(false);
@@ -30,6 +31,41 @@ private :
       Fired = (tw2[ibx]>>(ibit-64))&1;
   
     return Fired;
+  };
+
+  void loadPrescaleMap(){
+    PrescaleMap[6] = std::map<std::string,int>();
+    PrescaleMap[6]["L1_SingleJet092"] = 20000;
+    PrescaleMap[6]["L1_SingleJet052"] = 1400;
+    PrescaleMap[6]["L1_SingleJet068"] = 2500;
+    PrescaleMap[6]["L1_SingleJet092"] = 100;
+    PrescaleMap[6]["L1_SingleJet128"] = 1;
+    PrescaleMap[6]["L1_SingleJet176"] = 1;
+    PrescaleMap[6]["L1_SingleJet200"] = 1;
+    PrescaleMap[6]["L1_HTT075"] = 1;
+    PrescaleMap[6]["L1_HTT100"] = 1;
+    PrescaleMap[6]["L1_HTT125"] = 1;
+    PrescaleMap[6]["L1_HTT150"] = 1;
+    PrescaleMap[6]["L1_HTT175"] = 1;
+    PrescaleMap[6]["L1_HTT200"] = 1; 
+
+    PrescaleMap[7] = std::map<std::string,int>();
+    PrescaleMap[7]["L1_SingleJet092"] = 5000;
+    PrescaleMap[7]["L1_SingleJet052"] = 1000;
+    PrescaleMap[7]["L1_SingleJet068"] = 1000;
+    PrescaleMap[7]["L1_SingleJet092"] = 100;
+    PrescaleMap[7]["L1_SingleJet128"] = 1;
+    PrescaleMap[7]["L1_SingleJet176"] = 1;
+    PrescaleMap[7]["L1_SingleJet200"] = 1;
+    PrescaleMap[7]["L1_HTT075"] = 1;
+    PrescaleMap[7]["L1_HTT100"] = 1;
+    PrescaleMap[7]["L1_HTT125"] = 1;
+    PrescaleMap[7]["L1_HTT150"] = 1;
+    PrescaleMap[7]["L1_HTT175"] = 1;
+    PrescaleMap[7]["L1_HTT200"] = 1; 
+
+
+
   };
   
   void loadSingleJetTrigMap(){ 

@@ -11,25 +11,36 @@ double binoError(double selected, double all){
 void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
-  std::vector<std::string> preFireTrigger = {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200"};
-  // std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
+  // std::vector<std::string> preFireTrigger = {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200","L1_SingleJet240"};
+  std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
 
   L1Tree * l1Tree = getTree<L1Tree>("l1Tree");
 
   int n_events = l1Tree -> fChain -> GetEntries();
 
+  // loadSingleJetTrigMap();
   loadHTTTrigMap();
   loadBitMap();
+  loadPrescaleMap();
 
   l1Tree -> fChain -> SetBranchStatus("*", kFALSE);
   l1Tree -> fChain -> SetBranchStatus("tw1", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw2", kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("lumi",kTRUE);
 
   std::map<std::string,std::map<std::string,int>> nBx1,nBx2;
 
   for (int i = 0; i < n_events; ++i){
     l1Tree -> GetEntry(i);
     if ( (i + 1) % 10000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
+    int lumi = l1Tree -> lumi;
+    if (lumi < 126) continue;
+    int prescaleIndex;
+    if (lumi < 317){
+      prescaleIndex = 6;
+    }else{
+      prescaleIndex = 7;
+    };
 
     tw1 = l1Tree -> tw1;
     tw2 = l1Tree -> tw2;
@@ -54,12 +65,12 @@ void analysisClassL1::loop(){
           if (nBx2[preFireTrigger[iTrig]].find(triggerName) == nBx2[preFireTrigger[iTrig]].end()){
   	    nBx2[preFireTrigger[iTrig]][triggerName] = 0;
   	  };
-  	  nBx2[preFireTrigger[iTrig]][triggerName]++;
+  	  nBx2[preFireTrigger[iTrig]][triggerName] += PrescaleMap[prescaleIndex][triggerName];
   	  if (Bx1Fired){
   	    if (nBx2[preFireTrigger[iTrig]].find(triggerName) == nBx2[preFireTrigger[iTrig]].end()){
   	      nBx1[preFireTrigger[iTrig]][triggerName] = 0;
   	    };
-            nBx1[preFireTrigger[iTrig]][triggerName]++;
+            nBx1[preFireTrigger[iTrig]][triggerName]  += PrescaleMap[prescaleIndex][preFireTrigger[iTrig]]; 
   	  };
         };
       };
@@ -72,9 +83,11 @@ void analysisClassL1::loop(){
     for (std::map<std::string,int>::iterator it = nBx2[preFireTrigger[iTrig]].begin(); it != nBx2[preFireTrigger[iTrig]].end(); it++){
       std::string triggerName = it -> first;
       int nIt = std::distance(nBx2[preFireTrigger[iTrig]].begin(),it)+1;
-      graphs[preFireTrigger[iTrig]] -> SetBinContent(nIt,(double) nBx1[preFireTrigger[iTrig]][triggerName]/ it -> second);
-      graphs[preFireTrigger[iTrig]] -> SetBinError(nIt,binoError( nBx1[preFireTrigger[iTrig]][triggerName], it -> second) );
-      graphs[preFireTrigger[iTrig]] -> GetXaxis() -> SetBinLabel(nIt,triggerName.c_str());
+      if (it -> second != 0){
+        graphs[preFireTrigger[iTrig]] -> SetBinContent(nIt,(double) nBx1[preFireTrigger[iTrig]][triggerName]/ it -> second);
+        graphs[preFireTrigger[iTrig]] -> SetBinError(nIt,binoError( nBx1[preFireTrigger[iTrig]][triggerName], it -> second) );
+        graphs[preFireTrigger[iTrig]] -> GetXaxis() -> SetBinLabel(nIt,triggerName.c_str());
+      };
     };
     char titleName[200];
     // sprintf(titleName," Pre Trigger: %s ; Trigger at Nominal BX  ; Pretrigger Rate",preFireTrigger[iTrig].c_str());
