@@ -14,6 +14,7 @@ class analysisClassL1 : public analysisClass {
 
 private :
 
+  Double_t PHIBIN[18] = {10,30,50,70,90,110,130,150,170,190,210,230,250,270,290,310,330,350};
   std::map<std::string,int> HFPrefiringBitMap;
   std::map<std::string,int>::iterator trigbit_iter;
   std::map<std::string,TH1F*> histoMap;
@@ -22,6 +23,12 @@ private :
   std::vector<TString> hlt;
   std::map<std::string,int> BitMap;
   std::map<int,std::map<std::string,int> > PrescaleMap;
+  Int_t Njet;
+  std::vector<int> Bxjet;
+  std::vector<float> Rankjet;
+  std::vector<float> Etajet;
+  std::vector<float> Phijet;
+  std::vector<bool> Fwdjet;
 
   bool checkTriggerBit(const int & ibit,const int & ibx ){
     bool Fired(false);
@@ -118,10 +125,81 @@ private :
    return accept; 
   };
 
-// bool analysisClassL1::isSelectedBx(int bunchNumber){
-//   std::vector<int> nominalBx = {375,1269,2151,3045};
-//   return (std::find(nominalBx.begin(),nominalBx.end(),bunchNumber) != nominalBx.end());
-// }
+  float SingleJetEta(float ptCut, Int_t accept_flag = 1) {
+  
+    float maxPt = -10;
+    float iJetMaxPt = -10;
+  
+    Int_t Nj = Njet ;
+    for(Int_t ue=0; ue < Nj; ue++) {
+      Int_t bx = Bxjet[ue];        		
+      if(bx != 0) continue;
+      Bool_t isFwdJet = Fwdjet[ue];
+  
+      if(accept_flag == 1 && isFwdJet) continue;
+      if(accept_flag == 2 && !isFwdJet) continue;
+  
+      Float_t pt = Rankjet[ue]*4.;
+      if(pt >= maxPt){
+        maxPt = pt;
+        iJetMaxPt = ue;
+      }
+    }
+  
+    float eta = -10.;
+    int ieta = iJetMaxPt>=0 && maxPt>ptCut ? Etajet[iJetMaxPt] : -10;
+    if(ieta > 0) eta = convertRegionEta(ieta);
+    return eta;
+  };
+
+  float SingleJetPhi(float ptCut) {
+  
+    float maxPt = -10;
+    float iJetMaxPt = -10;
+  
+    Int_t Nj = Njet ;
+    for(Int_t ue=0; ue < Nj; ue++) {
+      Int_t bx = Bxjet[ue];        		
+      if(bx != 0) continue;
+  
+      Float_t pt = Rankjet[ue]*4.;
+      if(pt >= maxPt){
+        maxPt = pt;
+        iJetMaxPt = ue;
+      }
+    }
+  
+    float phi = -10.;
+    int iphi = iJetMaxPt>=0 && maxPt>ptCut ? Phijet[iJetMaxPt] : -10; 
+    if(iphi > 0) phi = PHIBIN[iphi]/100;
+    return phi;
+  };
+
+
+  Double_t convertRegionEta(int iEta) {
+    static const double rgnEtaValues[11] = {
+       0.174, // HB and inner HE bins are 0.348 wide
+       0.522,
+       0.870,
+       1.218,
+       1.566,
+       1.956, // Last two HE bins are 0.432 and 0.828 wide
+       2.586,
+       3.250, // HF bins are 0.5 wide
+       3.750,
+       4.250,
+       4.750
+    };
+    if(iEta < 11) {
+      return -rgnEtaValues[-(iEta - 10)]; // 0-10 are negative eta values
+    }
+    else if (iEta < 22) {
+      return rgnEtaValues[iEta - 11];     // 11-21 are positive eta values
+    }
+    return -9;
+  };
+
+
 
 };
 #endif
