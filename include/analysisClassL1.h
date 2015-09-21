@@ -125,6 +125,34 @@ private :
    return accept; 
   };
 
+  // float SingleJetEtaBin(float ptCut, Int_t accept_flag = 1) { 
+  float SingleJetEtaBin(float ptCut,int selectedBx) {
+ 
+    float maxPt = -10;
+    float iJetMaxPt = -10;
+  
+    Int_t Nj = Njet ;
+    for(Int_t ue=0; ue < Nj; ue++) {
+      Int_t bx = Bxjet[ue];
+      // std::cout << bx << std::endl;
+      if(bx != selectedBx) continue;
+      // Bool_t isFwdJet = Fwdjet[ue];
+  
+      // if(accept_flag == 1 && isFwdJet) continue;
+      // if(accept_flag == 2 && !isFwdJet) continue;
+  
+      Float_t pt = Rankjet[ue]*4.;
+      if(pt >= maxPt){
+        maxPt = pt;
+        iJetMaxPt = ue;
+      }
+    }
+  
+    float eta = -10.;
+    int ieta = iJetMaxPt>=0 && maxPt>ptCut ? Etajet[iJetMaxPt] : -10;
+    return ieta;
+  };
+
   float SingleJetEta(float ptCut, Int_t accept_flag = 1) {
   
     float maxPt = -10;

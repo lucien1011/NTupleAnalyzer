@@ -6,6 +6,9 @@ void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
 
+  std::vector<std::string> triggerList =  {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200","L1_SingleJet240"};
+  std::vector<std::string> preTriggerList =  {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200","L1_SingleJet240"};
+
   L1Tree * l1Tree = getTree<L1Tree>("l1Tree");
 
   int n_events = l1Tree -> fChain -> GetEntries();
@@ -21,8 +24,24 @@ void analysisClassL1::loop(){
   l1Tree -> fChain -> SetBranchStatus("tw1",kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw2",kTRUE);
   
-  // TH2F * h_eta_vs_phi = makeTH2F("h_eta_vs_phi",100,-5.,5.,100,-3.14,3.14);
-  TH1F * h_eta = makeTH1F("h_eta",100,-5.,5.);
+  std::map<std::string,TH1F*> etaHistList;
+  std::map<std::string,TH1F*> l1BitHistList;
+  std::map<std::string,std::map<std::string,TH1F*>> preFireEtaHistList;
+  char histName[100];
+  for (std::vector<std::string>::iterator it = triggerList.begin(); it != triggerList.end(); it++){
+    sprintf(histName,"h_etaBin_%s",it->c_str());
+    etaHistList[*it] = makeTH1F(histName,22,-0.5,21.5);
+    sprintf(histName,"h_l1Bit_%s",it->c_str());
+    l1BitHistList[*it] = makeTH1F(histName,2,-0.5,1.5);
+    preFireEtaHistList[*it] = std::map<std::string,TH1F*>();
+    for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
+      sprintf(histName,"%s_%s",it->c_str(),it2->c_str());
+      preFireEtaHistList[*it][*it2] = makeTH1F(histName,22,-0.5,21.5);
+    };
+  };
+
+  loadPrescaleMap();
+  loadBitMap();
 
   for (int i = 0; i < n_events; ++i){
     l1Tree -> GetEntry(i);
@@ -48,21 +67,37 @@ void analysisClassL1::loop(){
     tw1 = l1Tree -> tw1;
     tw2 = l1Tree -> tw2;
 
-    loadBitMap();
+    for (std::vector<std::string>::iterator it = triggerList.begin(); it != triggerList.end(); it++){
+      bool Bx2Fired = checkTriggerBit(BitMap[*it],2);
+      float ptThreshold = (float)std::stoi(it -> substr(12)); 
+      int jetEtaBin = SingleJetEtaBin(ptThreshold,0);
+      if (Bx2Fired){
+        l1BitHistList[*it] -> Fill(1,PrescaleMap[prescaleIndex][*it]);
+      };
 
-    bool Bx2Fired = checkTriggerBit(BitMap["L1_HTT150"],2);      
+      if (jetEtaBin != -10){
+        etaHistList[*it] -> Fill(jetEtaBin,PrescaleMap[prescaleIndex][*it]);
+        for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
+	  float ptThreshold_BxM1 = (float)std::stoi(it2 -> substr(12));
+	  int jetEtaBin_BxM1 = SingleJetEtaBin(ptThreshold_BxM1,-1);
+          if (jetEtaBin_BxM1 != -10){
+            preFireEtaHistList[*it][*it2] -> Fill(jetEtaBin_BxM1,PrescaleMap[prescaleIndex][*it2]);
+	  };
+	};
+      };
+    };
+  };
 
-    if (not Bx2Fired) continue;
+  char titleName[100];
+  for (std::map<std::string,TH1F*>::iterator itr = etaHistList.begin(); itr != etaHistList.end(); ++itr){
+    sprintf(titleName,"%s, SingleJet:%4.0f, L1Bit:%4.0f ; Eta Bin ( 0 - 21 ); Number of Event",itr->first.c_str(),itr -> second -> Integral(),l1BitHistList[itr->first]->Integral());
+    itr -> second -> SetTitle(titleName);
+    for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
+      sprintf(titleName,"Bx2: %s, Bx1: %s, Prefire Rate: %4.3f ; Eta Bin ( 0 - 21 ); Number of Event",itr->first.c_str(),it2->c_str(),preFireEtaHistList[itr->first][*it2]->Integral()/itr->second->Integral());
+      preFireEtaHistList[itr->first][*it2] -> SetTitle(titleName);
 
-    float jetEta = SingleJetEta(128.);
-    float jetPhi = SingleJetPhi(128.);
-    // if ((jetEta != -10) && (jetPhi != -10)){
-    //   std::cout << jetEta << " " << jetPhi << std::endl;
-    // };
 
-    // h_eta_vs_phi -> Fill(jetEta,jetPhi);
-    h_eta -> Fill(jetEta);
-
+    };
   };
 }
 
