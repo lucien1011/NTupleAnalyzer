@@ -180,6 +180,28 @@ private :
     return eta;
   };
 
+  float SingleJetPhiBin(float ptCut,int selectedBx) {
+  
+    float maxPt = -10;
+    float iJetMaxPt = -10;
+  
+    Int_t Nj = Njet ;
+    for(Int_t ue=0; ue < Nj; ue++) {
+      Int_t bx = Bxjet[ue];        		
+      if(bx != selectedBx) continue;
+  
+      Float_t pt = Rankjet[ue]*4.;
+      if(pt >= maxPt){
+        maxPt = pt;
+        iJetMaxPt = ue;
+      }
+    }
+  
+    float phi = -10.;
+    int iphi = iJetMaxPt>=0 && maxPt>ptCut ? Phijet[iJetMaxPt] : -10; 
+    return iphi;
+  };
+
   float SingleJetPhi(float ptCut) {
   
     float maxPt = -10;
