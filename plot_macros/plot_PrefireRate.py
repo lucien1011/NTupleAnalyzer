@@ -21,7 +21,7 @@ c = ROOT.TCanvas()
 l = ROOT.TLegend(0.1,0.7,0.48,0.9)
 for i,hist in enumerate(hists):
 	hist.SetStats(0)
-	hist.SetTitle(histName)
+	hist.SetTitle("")
 	hist.SetLineColor(i+1)
 	hist.GetYaxis().SetRangeUser(0,maximum*1.1)
 	hist.Draw("same")
