@@ -84,6 +84,7 @@ void analysisClassL1::loop(){
 
       if ((jetEtaBin != -10) && (jetPhiBin != -10)){
         etaHistList[*it] -> Fill(jetEtaBin,PrescaleMap[prescaleIndex][*it]);
+	etaPhiHistList[*it] -> Fill(jetEtaBin,jetPhiBin,PrescaleMap[prescaleIndex][*it]);
         for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
 	  float ptThreshold_BxM1 = (float)std::stoi(it2 -> substr(12));
 	  int jetEtaBin_BxM1 = SingleJetEtaBin(ptThreshold_BxM1,-1);
@@ -99,8 +100,10 @@ void analysisClassL1::loop(){
 
   char titleName[100];
   for (std::map<std::string,TH1F*>::iterator itr = etaHistList.begin(); itr != etaHistList.end(); ++itr){
-    sprintf(titleName,"%s, SingleJet:%4.0f, L1Bit:%4.0f ; Eta Bin ( 0 - 21 ); Number of Event",itr->first.c_str(),itr -> second -> Integral(),l1BitHistList[itr->first]->Integral());
+    sprintf(titleName,"%s, L1Object:%4.0f, L1Bit:%4.0f ; Eta Bin ( 0 - 21 ); Number of Event",itr->first.c_str(),itr -> second -> Integral(),l1BitHistList[itr->first]->Integral());
     itr -> second -> SetTitle(titleName);
+    sprintf(titleName,"%s, L1Object:%4.0f, L1Bit:%4.0f ; Eta Bin ( 0 - 21 ); Phi Bin ( 0 - 17 )",itr->first.c_str(),etaPhiHistList[itr -> first],l1BitHistList[itr->first]->Integral());
+    etaPhiHistList[itr -> first] -> SetTitle(titleName);
     for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
       sprintf(titleName,"Bx2: %s, Bx1: %s, Prefire Rate: %4.3f ; Eta Bin ( 0 - 21 ); Number of Event",itr->first.c_str(),it2->c_str(),preFireEtaHistList[itr->first][*it2]->Integral()/itr->second->Integral());
       preFireEtaHistList[itr->first][*it2] -> SetTitle(titleName);
