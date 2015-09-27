@@ -2,6 +2,12 @@
 #include "analysisClassL1.h"
 #include <algorithm>
 
+double DeltaR(double eta1, double eta2, double phi1, double phi2){
+  double deltaEta = abs(eta1 - eta2);
+  double deltaPhi = abs(phi1 - phi2);
+  return sqrt(deltaEta*deltaEta+deltaPhi*deltaPhi);
+};
+
 void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
@@ -29,6 +35,7 @@ void analysisClassL1::loop(){
   std::map<std::string,TH1F*> l1BitHistList;
   std::map<std::string,std::map<std::string,TH1F*>> preFireEtaHistList;
   std::map<std::string,std::map<std::string,TH2F*>> preFireEtaPhiHistList;
+  std::map<std::string,std::map<std::string,TH1F*>> deltaRHistList;
   char histName[100];
   for (std::vector<std::string>::iterator it = triggerList.begin(); it != triggerList.end(); it++){
     sprintf(histName,"h_etaBin_%s",it->c_str());
@@ -43,6 +50,8 @@ void analysisClassL1::loop(){
       preFireEtaHistList[*it][*it2] = makeTH1F(histName,22,-0.5,21.5);
       sprintf(histName,"h_preFireEtaPhiBin%s_%s",it->c_str(),it2->c_str());
       preFireEtaPhiHistList[*it][*it2] = makeTH2F(histName,22,-0.5,21.5,18,-0.5,17.5);
+      sprintf(histName,"h_deltaR%s_%s",it->c_str(),it2->c_str());
+      deltaRHistList[*it][*it2] = makeTH1F(histName,50,-0.5,5.5);
     };
   };
 
@@ -89,9 +98,14 @@ void analysisClassL1::loop(){
 	  float ptThreshold_BxM1 = (float)std::stoi(it2 -> substr(12));
 	  int jetEtaBin_BxM1 = SingleJetEtaBin(ptThreshold_BxM1,-1);
 	  int jetPhiBin_BxM1 = SingleJetPhiBin(ptThreshold_BxM1,-1);
-          if ((jetEtaBin_BxM1 != -10) && (jetPhiBin_BxM1)){
+          if ((jetEtaBin_BxM1 != -10) && (jetPhiBin_BxM1 != -10)){
             preFireEtaHistList[*it][*it2] -> Fill(jetEtaBin_BxM1,PrescaleMap[prescaleIndex][*it2]);
 	    preFireEtaPhiHistList[*it][*it2] -> Fill(jetEtaBin_BxM1,jetPhiBin_BxM1,PrescaleMap[prescaleIndex][*it2]);
+            double jetEta_BxM1 = SingleJetEta(ptThreshold_BxM1,-1);
+            double jetPhi_BxM1 = SingleJetPhi(ptThreshold_BxM1,-1);
+            double jetEta = SingleJetEta(ptThreshold,0);
+            double jetPhi = SingleJetPhi(ptThreshold,0);
+	    deltaRHistList[*it][*it2] -> Fill(DeltaR(jetEta_BxM1,jetEta,jetPhi_BxM1,jetPhi));
 	  };
 	};
       };

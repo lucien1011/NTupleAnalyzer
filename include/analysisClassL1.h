@@ -154,7 +154,7 @@ private :
     return ieta;
   };
 
-  float SingleJetEta(float ptCut, Int_t accept_flag = 1) {
+  float SingleJetEta(float ptCut, int selectedBx) {
   
     float maxPt = -10;
     float iJetMaxPt = -10;
@@ -162,11 +162,11 @@ private :
     Int_t Nj = Njet ;
     for(Int_t ue=0; ue < Nj; ue++) {
       Int_t bx = Bxjet[ue];        		
-      if(bx != 0) continue;
-      Bool_t isFwdJet = Fwdjet[ue];
+      if(bx != selectedBx) continue;
+      // Bool_t isFwdJet = Fwdjet[ue];
   
-      if(accept_flag == 1 && isFwdJet) continue;
-      if(accept_flag == 2 && !isFwdJet) continue;
+      // if(accept_flag == 1 && isFwdJet) continue;
+      // if(accept_flag == 2 && !isFwdJet) continue;
   
       Float_t pt = Rankjet[ue]*4.;
       if(pt >= maxPt){
@@ -203,7 +203,7 @@ private :
     return iphi;
   };
 
-  float SingleJetPhi(float ptCut) {
+  float SingleJetPhi(float ptCut,int selectedBx) {
   
     float maxPt = -10;
     float iJetMaxPt = -10;
@@ -211,7 +211,7 @@ private :
     Int_t Nj = Njet ;
     for(Int_t ue=0; ue < Nj; ue++) {
       Int_t bx = Bxjet[ue];        		
-      if(bx != 0) continue;
+      if(bx != selectedBx) continue;
   
       Float_t pt = Rankjet[ue]*4.;
       if(pt >= maxPt){
