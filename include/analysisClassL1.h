@@ -20,6 +20,7 @@ private :
   std::map<std::string,TH1F*> histoMap;
   std::vector<ULong64_t> tw1;
   std::vector<ULong64_t> tw2;
+  std::vector<ULong64_t> tt;
   std::vector<TString> hlt;
   std::map<std::string,int> BitMap;
   std::map<int,std::map<std::string,int> > PrescaleMap;
