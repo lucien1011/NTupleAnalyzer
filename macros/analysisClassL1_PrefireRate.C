@@ -11,15 +11,15 @@ double binoError(double selected, double all){
 void analysisClassL1::loop(){
 
   std::string MyTrigger="HLT_Any";
-  std::vector<std::string> preFireTrigger = {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200","L1_SingleJet240"};
-  // std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
+  // std::vector<std::string> preFireTrigger = {"L1_SingleJet092","L1_SingleJet128","L1_SingleJet176","L1_SingleJet200","L1_SingleJet240"};
+  std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
 
   L1Tree * l1Tree = getTree<L1Tree>("l1Tree");
 
   int n_events = l1Tree -> fChain -> GetEntries();
 
-  loadSingleJetTrigMap();
-  // loadHTTTrigMap();
+  // loadSingleJetTrigMap();
+  loadHTTTrigMap();
   loadBitMap();
   loadPrescaleMap();
 
@@ -28,6 +28,7 @@ void analysisClassL1::loop(){
   l1Tree -> fChain -> SetBranchStatus("tw2", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("lumi",kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tt",kTRUE);
+  l1Tree -> fChain -> SetBranchStatus("bx",kTRUE);
 
   std::map<std::string,std::map<std::string,int>> nBx1,nBx2;
 
@@ -42,6 +43,10 @@ void analysisClassL1::loop(){
     }else{
       prescaleIndex = 7;
     };
+
+    int bunchNumber = l1Tree -> bx;
+
+    if (not selectBX(bunchNumber)) continue;
 
     tw1 = l1Tree -> tw1;
     tw2 = l1Tree -> tw2;

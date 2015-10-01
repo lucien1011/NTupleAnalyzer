@@ -2,6 +2,7 @@
 #define analysisClassL1_h
 
 #include "analysisClass.h"
+#include <algorithm>
 
 class analysisClassL1 : public analysisClass {
  
@@ -111,6 +112,12 @@ private :
     HFPrefiringBitMap["L1_HTT150"] = 71;
     HFPrefiringBitMap["L1_HTT175"] = 72;
     HFPrefiringBitMap["L1_HTT200"] = 73; 
+  };
+
+  bool selectBX(int& currentBX){
+    std::vector<int> bxList = {39,141,260,370,1154,1164,2048,2048,2158,3052};
+
+    return (std::find(bxList.begin(),bxList.end(),currentBX) != bxList.end());
   };
 
   bool checkHLT(const std::string MyTrigger){
