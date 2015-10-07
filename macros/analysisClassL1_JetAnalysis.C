@@ -34,8 +34,14 @@ void analysisClassL1::loop(){
   std::map<std::string,TH2F*> etaPhiHistList;
   std::map<std::string,TH1F*> l1BitHistList;
   std::map<std::string,std::map<std::string,TH1F*>> preFireEtaHistList;
+  std::map<std::string,std::map<std::string,TH2F*>> prePreFireEtaPhiHistList;
   std::map<std::string,std::map<std::string,TH2F*>> preFireEtaPhiHistList;
+  std::map<std::string,std::map<std::string,TH2F*>> postFireEtaPhiHistList;
+  std::map<std::string,std::map<std::string,TH2F*>> postPostFireEtaPhiHistList;
   std::map<std::string,std::map<std::string,TH1F*>> deltaRHistList;
+  std::map<std::string,std::map<std::string,TH1F*>> postDeltaRHistList;
+  std::map<std::string,std::map<std::string,TH1F*>> postPostDeltaRHistList;
+  std::map<std::string,std::map<std::string,TH1F*>> prePreDeltaRHistList;
   char histName[100];
   for (std::vector<std::string>::iterator it = triggerList.begin(); it != triggerList.end(); it++){
     sprintf(histName,"h_etaBin_%s",it->c_str());
@@ -48,10 +54,22 @@ void analysisClassL1::loop(){
     for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
       sprintf(histName,"h_preFireEtaBin%s_%s",it->c_str(),it2->c_str());
       preFireEtaHistList[*it][*it2] = makeTH1F(histName,22,-0.5,21.5);
+      sprintf(histName,"h_prePreFireEtaPhiBin%s_%s",it->c_str(),it2->c_str());
+      prePreFireEtaPhiHistList[*it][*it2] = makeTH2F(histName,22,-0.5,21.5,18,-0.5,17.5);
       sprintf(histName,"h_preFireEtaPhiBin%s_%s",it->c_str(),it2->c_str());
       preFireEtaPhiHistList[*it][*it2] = makeTH2F(histName,22,-0.5,21.5,18,-0.5,17.5);
+      sprintf(histName,"h_postFireEtaPhiBin%s_%s",it->c_str(),it2->c_str());
+      postFireEtaPhiHistList[*it][*it2] = makeTH2F(histName,22,-0.5,21.5,18,-0.5,17.5);
+      sprintf(histName,"h_postPostFireEtaPhiBin%s_%s",it->c_str(),it2->c_str());
+      postPostFireEtaPhiHistList[*it][*it2] = makeTH2F(histName,22,-0.5,21.5,18,-0.5,17.5);
       sprintf(histName,"h_deltaR%s_%s",it->c_str(),it2->c_str());
       deltaRHistList[*it][*it2] = makeTH1F(histName,50,-0.5,5.5);
+      sprintf(histName,"h_postDeltaR%s_%s",it->c_str(),it2->c_str());
+      postDeltaRHistList[*it][*it2] = makeTH1F(histName,50,-0.5,5.5);
+      sprintf(histName,"h_prePreDeltaR%s_%s",it->c_str(),it2->c_str());
+      prePreDeltaRHistList[*it][*it2] = makeTH1F(histName,50,-0.5,5.5);
+      sprintf(histName,"h_postPostDeltaR%s_%s",it->c_str(),it2->c_str());
+      postPostDeltaRHistList[*it][*it2] = makeTH1F(histName,50,-0.5,5.5);
     };
   };
 
@@ -95,18 +113,43 @@ void analysisClassL1::loop(){
         etaHistList[*it] -> Fill(jetEtaBin,PrescaleMap[prescaleIndex][*it]);
 	etaPhiHistList[*it] -> Fill(jetEtaBin,jetPhiBin,PrescaleMap[prescaleIndex][*it]);
         for (std::vector<std::string>::iterator it2 = preTriggerList.begin(); it2 != preTriggerList.end(); it2++){
-	  float ptThreshold_BxM1 = (float)std::stoi(it2 -> substr(12));
-	  int jetEtaBin_BxM1 = SingleJetEtaBin(ptThreshold_BxM1,-1);
-	  int jetPhiBin_BxM1 = SingleJetPhiBin(ptThreshold_BxM1,-1);
+	  float ptThreshold_OtherBx = (float)std::stoi(it2 -> substr(12));
+	  int jetEtaBin_BxM1 = SingleJetEtaBin(ptThreshold_OtherBx,-1);
+	  int jetPhiBin_BxM1 = SingleJetPhiBin(ptThreshold_OtherBx,-1);
           if ((jetEtaBin_BxM1 != -10) && (jetPhiBin_BxM1 != -10)){
             preFireEtaHistList[*it][*it2] -> Fill(jetEtaBin_BxM1,PrescaleMap[prescaleIndex][*it2]);
 	    preFireEtaPhiHistList[*it][*it2] -> Fill(jetEtaBin_BxM1,jetPhiBin_BxM1,PrescaleMap[prescaleIndex][*it2]);
-            double jetEta_BxM1 = SingleJetEta(ptThreshold_BxM1,-1);
-            double jetPhi_BxM1 = SingleJetPhi(ptThreshold_BxM1,-1);
+            double jetEta_BxM1 = SingleJetEta(ptThreshold_OtherBx,-1);
+            double jetPhi_BxM1 = SingleJetPhi(ptThreshold_OtherBx,-1);
             double jetEta = SingleJetEta(ptThreshold,0);
             double jetPhi = SingleJetPhi(ptThreshold,0);
 	    deltaRHistList[*it][*it2] -> Fill(DeltaR(jetEta_BxM1,jetEta,jetPhi_BxM1,jetPhi));
 	  };
+	  int jetEtaBin_BxP1 = SingleJetEtaBin(ptThreshold_OtherBx,1);
+	  int jetPhiBin_BxP1 = SingleJetPhiBin(ptThreshold_OtherBx,1);
+	  if ((jetEtaBin_BxP1 != -10) && (jetPhiBin_BxP1 != -10)){
+	    double jetEta = SingleJetEta(ptThreshold,0);
+            double jetPhi = SingleJetPhi(ptThreshold,0);
+	    postFireEtaPhiHistList[*it][*it2] -> Fill(jetEtaBin_BxP1,jetPhiBin_BxP1,PrescaleMap[prescaleIndex][*it2]);
+            postDeltaRHistList[*it][*it2] -> Fill(DeltaR(jetEtaBin_BxP1,jetEta,jetPhiBin_BxP1,jetPhi));
+	  };
+	  int jetEtaBin_BxM2 = SingleJetEtaBin(ptThreshold_OtherBx,-2);
+	  int jetPhiBin_BxM2 = SingleJetPhiBin(ptThreshold_OtherBx,-2);
+	  if ((jetEtaBin_BxM2 != -10) && (jetPhiBin_BxM2 != -10)){
+	    double jetEta = SingleJetEta(ptThreshold,0);
+            double jetPhi = SingleJetPhi(ptThreshold,0);
+	    prePreFireEtaPhiHistList[*it][*it2] -> Fill(jetEtaBin_BxM2,jetPhiBin_BxM2,PrescaleMap[prescaleIndex][*it2]);
+            prePreDeltaRHistList[*it][*it2] -> Fill(DeltaR(jetEtaBin_BxM2,jetEta,jetPhiBin_BxM2,jetPhi));
+	  };
+	  int jetEtaBin_BxP2 = SingleJetEtaBin(ptThreshold_OtherBx,2);
+	  int jetPhiBin_BxP2 = SingleJetPhiBin(ptThreshold_OtherBx,2);
+	  if ((jetEtaBin_BxP2 != -10) && (jetPhiBin_BxP2 != -10)){
+	    double jetEta = SingleJetEta(ptThreshold,0);
+            double jetPhi = SingleJetPhi(ptThreshold,0);
+	    postPostFireEtaPhiHistList[*it][*it2] -> Fill(jetEtaBin_BxP2,jetPhiBin_BxP2,PrescaleMap[prescaleIndex][*it2]);
+            postPostDeltaRHistList[*it][*it2] -> Fill(DeltaR(jetEtaBin_BxP2,jetEta,jetPhiBin_BxP2,jetPhi));
+	  };
+
 	};
       };
     };
@@ -123,7 +166,8 @@ void analysisClassL1::loop(){
       preFireEtaHistList[itr->first][*it2] -> SetTitle(titleName);
       sprintf(titleName,"Bx2: %s, Bx1: %s, Prefire Rate: %4.3f ; Eta Bin ( 0 - 21 ); Phi Bin (0 - 17)",itr->first.c_str(),it2->c_str(),preFireEtaHistList[itr->first][*it2]->Integral()/itr->second->Integral());
       preFireEtaPhiHistList[itr->first][*it2] -> SetTitle(titleName);
-
+      sprintf(titleName,"Bx2: %s, Bx1: %s, Prefire Rate: %4.3f ; Eta Bin ( 0 - 21 ); Phi Bin (0 - 17)",itr->first.c_str(),it2->c_str(),preFireEtaHistList[itr->first][*it2]->Integral()/itr->second->Integral());
+      postFireEtaPhiHistList[itr->first][*it2] -> SetTitle(titleName);
     };
   };
 }

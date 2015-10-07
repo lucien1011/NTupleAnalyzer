@@ -5,7 +5,11 @@ from PlotParser import parser
 def selectHist(histName,requireString):
 	return requireString in histName.split("_")[1]
 
-selectHistString = "preFireEtaPhiBin"
+# selectHistString = "preFireEtaPhiBin"
+# selectHistString = "postFireEtaPhiBin"
+selectHistString = "prePreFireEtaPhiBin"
+# selectHistString = "deltaR"
+# selectHistString = "postDeltaR"
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 args = parser.parse_args()
