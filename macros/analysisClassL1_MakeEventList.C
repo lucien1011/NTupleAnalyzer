@@ -23,7 +23,7 @@ void analysisClassL1::loop(){
   l1Tree -> fChain -> SetBranchStatus("event", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw1", kTRUE);
   l1Tree -> fChain -> SetBranchStatus("tw2", kTRUE);
-  l1Tree -> fChain -> SetBranchStatus("tt" , kTRUE);
+  // l1Tree -> fChain -> SetBranchStatus("tt" , kTRUE);
   // l1Tree -> fChain -> SetBranchStatus("hlt", kTRUE);
 
   FILE * f;
@@ -32,7 +32,7 @@ void analysisClassL1::loop(){
   for (int i = 0; i < n_events; ++i){
    
     l1Tree -> GetEntry(i);
-    if ( (i + 1) % 1000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
+    if ( (i + 1) % 10000 == 0 ) std::cout << "Processing event " << i + 1 << "/" << n_events << std::endl;
 
     // hlt = l1Tree -> hlt;
     // bool accept = checkHLT(HLTTrigger);
@@ -49,11 +49,11 @@ void analysisClassL1::loop(){
 
     bool Bx1Fired = checkTriggerBit(BitMap[preFireTrigger],1);      
     bool Bx2Fired = checkTriggerBit(BitMap[nominalTrigger],2);
-    bool ttbit0 = (tt[2]>>0)&1;
 
-    if (Bx1Fired && Bx2Fired && ttbit0){
-      fprintf(f,"%d %d %d",runNumber,lumiSection,eventNumber);
+    if (Bx1Fired && Bx2Fired){
+      fprintf(f,"%d %d %d \n",runNumber,lumiSection,eventNumber);
     };
+
   };
 
   fclose(f);
