@@ -1,6 +1,7 @@
 
 import ROOT
 from PlotParser import parser
+from Utils import binoError
 
 #____________________________________________________________________________||
 #Configurables
@@ -24,9 +25,22 @@ jetThresholds = [ int(k.GetName().split("_")[-1]) for k in inputFile.GetListOfKe
 hbheHists = [ inputFile.Get(hbhePrefireHistName%jetThreshold).Clone("Clone_"+hbhePrefireHistName%jetThreshold) for jetThreshold in jetThresholds ]
 hfHists = [ inputFile.Get(hfPrefireHistName%jetThreshold).Clone() for jetThreshold in jetThresholds ]
 for hbheHist in hbheHists:
+	cloneHist = hbheHist.Clone()
 	hbheHist.Divide(nomBxFireHist)
+	for ibin in range(cloneHist.GetNbinsX()+1):
+		select = cloneHist.GetBinContent(ibin)
+		allEvent = nomBxFireHist.GetBinContent(ibin)
+		if allEvent != 0:
+			hbheHist.SetBinError(ibin,binoError(select,allEvent))
 for hfHist in hfHists:
+	cloneHist = hfHist.Clone()
 	hfHist.Divide(nomBxFireHist)
+	for ibin in range(cloneHist.GetNbinsX()+1):
+		select = cloneHist.GetBinContent(ibin)
+		allEvent = nomBxFireHist.GetBinContent(ibin)
+		if allEvent != 0:
+			hfHist.SetBinError(ibin,binoError(select,allEvent))
+
 hbheMax = max([ hbheHist.GetMaximum() for hbheHist in hbheHists ])
 hfMax = max([ hfHist.GetMaximum() for hfHist in hfHists ])
 
