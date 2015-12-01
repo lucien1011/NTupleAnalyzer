@@ -33,11 +33,6 @@ void analysisClassL1::loop(){
 //__________________________________________________________________||
 //Loading Trigger Map
 
-  // loadSingleJetTrigMap();
-  // loadHTTTrigMap();
-  // loadBitMap();
-  // loadPrescaleMap();
-
 //__________________________________________________________________||
 //Turn on necessary branches
   l1Tree -> fChain -> SetBranchStatus("*", kFALSE);
@@ -52,13 +47,13 @@ void analysisClassL1::loop(){
 //__________________________________________________________________||
 //Histograms
   char histName[100];
-  std::map<double,TH1F*> h_previousBxFire_HF;
-  std::map<double,TH1F*> h_previousBxFire_HBHE;
+  std::map<double,TEfficiency*> h_previousBxFire_HF;
+  std::map<double,TEfficiency*> h_previousBxFire_HBHE;
   for (std::vector<double>::iterator it = preFireTrigger.begin(); it != preFireTrigger.end(); it++){
     sprintf(histName,"h_previousBxFire_HF_%.0f",*it);
-    h_previousBxFire_HF[*it] =  makeTH1F(histName,nThresholds,lowPtThreshold,highPtThreshold);
+    h_previousBxFire_HF[*it] =  makeTEff(histName,nThresholds,lowPtThreshold,highPtThreshold);
     sprintf(histName,"h_previousBxFire_HBHE_%.0f",*it);
-    h_previousBxFire_HBHE[*it] =  makeTH1F(histName,nThresholds,lowPtThreshold,highPtThreshold);
+    h_previousBxFire_HBHE[*it] =  makeTEff(histName,nThresholds,lowPtThreshold,highPtThreshold);
   }; 
   // TH1F* h_previousBxFire_HF = makeTH1F("h_previousBxFire_HF",nThresholds,lowPtThreshold,highPtThreshold);
   // TH1F* h_previousBxFire_HBHE = makeTH1F("h_previousBxFire_HBHE",nThresholds,lowPtThreshold,highPtThreshold);
@@ -93,11 +88,15 @@ void analysisClassL1::loop(){
         h_nominalBxFire -> Fill( ptThreshold );
 	for (std::vector<double>::iterator it = preFireTrigger.begin(); it != preFireTrigger.end(); it++){
           int jetEtaBin_BxM1 = SingleJetEtaBin(*it,-1);
-          if (jetEtaBin_BxM1 == -10) continue;
-	  if (std::find(hfEtaBin.begin(),hfEtaBin.end(),jetEtaBin_BxM1) != hfEtaBin.end()){
-            h_previousBxFire_HF[*it] -> Fill( ptThreshold ); 
-          } else {
-            h_previousBxFire_HBHE[*it] -> Fill( ptThreshold ); 
+          if (jetEtaBin_BxM1 == -10) {
+	    h_previousBxFire_HF[*it] -> Fill( false , ptThreshold );
+            h_previousBxFire_HBHE[*it] -> Fill( false, ptThreshold ); 
+	  } else {
+	    if (std::find(hfEtaBin.begin(),hfEtaBin.end(),jetEtaBin_BxM1) != hfEtaBin.end()){
+              h_previousBxFire_HF[*it] -> Fill( true , ptThreshold ); 
+            } else {
+              h_previousBxFire_HBHE[*it] -> Fill( true , ptThreshold ); 
+	    };
 	  };
 	};	
       };
