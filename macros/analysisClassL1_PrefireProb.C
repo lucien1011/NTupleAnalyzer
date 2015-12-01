@@ -9,11 +9,11 @@ void analysisClassL1::loop(){
 //Configurables
 
   std::string HLT_Trigger = "HLT_Any";
-  std::vector<double> preFireTrigger = {120.,150.,180.,210.,240.};
+  std::vector<double> preFireTrigger = {30., 60., 90.,120.,150.,180.,210.,240.};
   // std::vector<std::string> preFireTrigger = {"L1_HTT075","L1_HTT100","L1_HTT125","L1_HTT150","L1_HTT175","L1_HTT200"};
-  double lowPtThreshold = 95.;
+  double lowPtThreshold = 45.;
   double highPtThreshold = 305.;
-  int nThresholds = 21;
+  int nThresholds = 26;
 
 //__________________________________________________________________||
 //Constant
@@ -33,10 +33,10 @@ void analysisClassL1::loop(){
 //__________________________________________________________________||
 //Loading Trigger Map
 
-  loadSingleJetTrigMap();
+  // loadSingleJetTrigMap();
   // loadHTTTrigMap();
-  loadBitMap();
-  loadPrescaleMap();
+  // loadBitMap();
+  // loadPrescaleMap();
 
 //__________________________________________________________________||
 //Turn on necessary branches
@@ -75,16 +75,10 @@ void analysisClassL1::loop(){
     
     if ((l1ExtraTree -> cenJetEt.size() == 0) && (l1ExtraTree -> fwdJetEt.size() == 0) ) continue;
 
-    int lumi = l1Tree -> lumi;
-    if (lumi < 126) continue;
-    // int prescaleIndex;
-    // if (lumi < 317){
-    //   prescaleIndex = 6;
-    // }else{
-    //   prescaleIndex = 7;
-    // };
-
     int bunchNumber = l1Tree -> bx;
+    
+    // if (bunchNumber != 39) continue;
+
     Njet = l1Tree -> Njet;
     Bxjet = l1Tree -> Bxjet;
     Rankjet = l1Tree -> Rankjet;
