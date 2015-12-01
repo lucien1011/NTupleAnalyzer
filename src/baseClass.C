@@ -104,6 +104,12 @@ TGraph* baseClass::makeTGraph(){
   return graph;
 };
 
+TEfficiency* baseClass::makeTEff( const char * name, int nbins, float xmin, float xmax ){
+  TEfficiency* teff = new TEfficiency( name , name , nbins , xmin , xmax );
+  m_objects.push_back(teff);
+  return teff;
+};
+
 void baseClass::write(){
   m_outFile -> cd();
   std::vector<TObject*>::iterator i_object   = m_objects.begin();
